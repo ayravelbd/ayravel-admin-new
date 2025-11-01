@@ -21,6 +21,7 @@ import {
   useCreateCategoryMutation,
   useEditCategoryMutation,
   useGetAllCategoriesQuery,
+  useGetMainCategoriesQuery,
 } from "@/redux/featured/categories/categoryApi";
 import { useForm, FormProvider } from "react-hook-form";
 import { ImagePlusIcon, XIcon } from "lucide-react";
@@ -39,6 +40,7 @@ type CategoryFormValues = {
   name: string;
   details: string;
   subCategories: Option[];
+  parentCategory?: string;
   iconName?: string;
   iconUrl?: string;
 };
@@ -53,7 +55,7 @@ export default function Category({
   editCategory,
   refetch,
 }: {
-  children?: string;
+  children?: React.ReactNode;
   type?: string;
   editCategory?: any;
   refetch?: any;
@@ -73,6 +75,7 @@ export default function Category({
       name: "",
       details: "",
       subCategories: [],
+      parentCategory: "",
       iconName: "",
       iconUrl: "",
     },
@@ -82,13 +85,20 @@ export default function Category({
 
   useEffect(() => {
     if (editCategory) {
+      console.log('Original subcategories:', editCategory.subCategories);
+      const mappedSubCategories = editCategory.subCategories?.map((sub: string) => {
+        console.log('Mapping subcategory:', sub);
+        return {
+          value: sub || 'empty',
+          label: sub || 'Unnamed Category',
+        };
+      }) || [];
+      console.log('Final mapped subcategories:', mappedSubCategories);
       reset({
         name: editCategory.name || "",
         details: editCategory.details || "",
-        subCategories: editCategory.subCategories.map((sub: SubCategory) => ({
-          value: sub._id,
-          label: sub.name,
-        })),
+        subCategories: mappedSubCategories,
+        parentCategory: editCategory.parentCategory || "",
         iconName: editCategory.icon?.name || "",
         iconUrl: editCategory.icon?.url || "",
       });
@@ -115,9 +125,16 @@ export default function Category({
 
   const { data: categoriesData, isLoading: isCategoriesLoading } =
     useGetAllCategoriesQuery(undefined);
+  const { data: mainCategoriesData } = useGetMainCategoriesQuery(undefined);
 
   const simplifiedCategories: Option[] =
     categoriesData?.map((cat: any) => ({
+      value: cat._id,
+      label: cat.name,
+    })) ?? [];
+
+  const mainCategories: Option[] =
+    mainCategoriesData?.map((cat: any) => ({
       value: cat._id,
       label: cat.name,
     })) ?? [];
@@ -129,28 +146,17 @@ export default function Category({
 
     try {
       const formData = new FormData();
-      let payload;
-
-      payload = {
+      const payload = {
         name: data.name,
         details: data.details,
         icon: {
-          name: data.iconName || "Default Icon Name", // always non-empty
-          url: iconImg?.file
-            ? "uploaded"
-            : editCategory?.icon?.url || "https://via.placeholder.com/150",
+          name: data.iconName || "Default Icon Name",
+          url: editCategory?.icon?.url || "https://via.placeholder.com/150",
         },
-        subCategories: data.subCategories.map((cat: any) => cat.value),
+        subCategories: data.subCategories.map((cat: any) => cat.value || cat.label),
+        parentCategory: data.parentCategory || undefined,
+        ...(type === "edit" && editCategory && { deletedImages: deletedImages || "" }),
       };
-      // If editing, retain existing image/banner
-      if (type === "edit" && editCategory) {
-        payload = {
-          ...payload,
-          image: editCategory?.image || "",
-          bannerImg: editCategory?.bannerImg || "",
-          deletedImages: deletedImages || "",
-        };
-      }
 
       // 🔹 Append payload JSON
       formData.append("data", JSON.stringify(payload));
@@ -243,20 +249,26 @@ export default function Category({
                   </div>
 
                   <div>
-                    <Label>Select SubCategory</Label>
+                    <Label>SubCategories</Label>
                     <MultipleSelector
-                      commandProps={{ label: "Select SubCategory" }}
-                      defaultOptions={simplifiedCategories}
-                      placeholder="Select SubCategory"
+                      commandProps={{ label: "Add SubCategories" }}
+                      defaultOptions={[]}
+                      placeholder="Type subcategory name and press Enter"
+                      creatable
                       hideClearAllButton
                       hidePlaceholderWhenSelected
+                      badgeClassName="pr-8 min-w-0 relative flex items-center gap-1"
                       emptyIndicator={
-                        <p className="text-center text-sm">No results found</p>
+                        <p className="text-center text-sm">Type to create new subcategory</p>
                       }
                       value={watch("subCategories")}
                       onChange={(val) => setValue("subCategories", val)}
                     />
                   </div>
+
+
+
+
 
                   <div className="*:not-first:mt-2">
                     <div className="flex-1 space-y-2">

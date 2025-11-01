@@ -10,11 +10,13 @@ import toast from "react-hot-toast";
 import {
   useGetSettingsQuery,
   useUpdateSettingsMutation,
+  useCreateSettingsMutation,
 } from "@/redux/featured/settings/settingsApi";
 
 export default function GeneralSettings() {
-  const { data: settingsData } = useGetSettingsQuery();
+  const { data: settingsData, refetch } = useGetSettingsQuery();
   const [updateSettings, { isLoading: isSaving }] = useUpdateSettingsMutation();
+  const [createSettings, { isLoading: isCreating }] = useCreateSettingsMutation();
 
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [bannerPreviews, setBannerPreviews] = useState<string[]>([]);
@@ -101,11 +103,14 @@ const MAX_LOGO_SIZE = 3 * 1024 * 1024; // 3MB
       if (logoFile) formData.append("logo", logoFile);
       bannerFiles.forEach((file) => formData.append("sliderImages", file));
 
-      const res = await updateSettings(formData).unwrap();
+      const res = settingsData?._id 
+        ? await updateSettings(formData).unwrap()
+        : await createSettings(formData).unwrap();
 
       toast.success(res.message || "Settings updated successfully!");
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
+      refetch();
     } catch (err: any) {
       const message =
         err?.data?.message ||
@@ -241,10 +246,10 @@ const MAX_LOGO_SIZE = 3 * 1024 * 1024; // 3MB
         <div className="flex justify-end">
           <Button
             onClick={handleSave}
-            disabled={isSaving}
+            disabled={isSaving || isCreating}
             className="h-12 px-8 bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold rounded-xl shadow-md flex items-center gap-3"
           >
-            {isSaving ? (
+            {(isSaving || isCreating) ? (
               <>
                 <Loader2 className="animate-spin w-5 h-5" />
                 Saving...

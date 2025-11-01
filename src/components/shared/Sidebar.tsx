@@ -448,15 +448,15 @@ export function AppSidebar({
         )}
       >
         <Image
-          src="/milko.png"
+          src="/logo.jpeg"
           alt="Logo"
-          width={30}
-          height={30}
+          width={40}
+          height={40}
           className="flex-shrink-0 rounded transition-transform duration-300 hover:scale-110"
         />
         {!isCollapsed && (
           <h1 className="text-lg font-bold text-black truncate transition-opacity duration-200">
-            Milko
+            AYravel
           </h1>
         )}
       </div>

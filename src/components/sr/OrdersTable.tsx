@@ -274,7 +274,7 @@ function OrderModal({
         <div class="receipt">
           <!-- Header -->
           <div class="header">
-            <div class="shop-name">MILKO</div>
+            <div class="shop-name">AYravel</div>
             <div style="font-size: 10px; margin: 3px 0;">Beside Dhaka-Ctg Highway,Fateh pur,Feni Sadar,Feni.</div>
             <div style="font-size: 10px;">Phone:+8801810-185636</div>
             <div class="receipt-title">*** SALES RECEIPT ***</div>

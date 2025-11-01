@@ -86,7 +86,7 @@ export default function DashboardLayout({
           >
             <div className="flex sm:hidden items-center gap-3 p-4 bg-white h-16">
               <Image
-                src="/milko.png"
+                src="/logo.jpeg"
                 alt="Logo"
                 width={30}
                 height={30}

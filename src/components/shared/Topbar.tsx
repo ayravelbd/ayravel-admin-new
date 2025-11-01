@@ -95,6 +95,17 @@ export function TopNavbar({ isSidebarOpen, toggleSidebar }: TopNavbarProps) {
         {/* Action Buttons - Hidden on small screens */}
         <div className="hidden md:flex items-center gap-1"></div>
 
+
+          <Link href={`https://ayravel.com`} target="_blank">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-gray-100 bg-gray-700 border-gray-100"
+                  >
+                    <IoLink />
+                    <span className="ml-2">Visit Site</span>
+                  </Button>
+                </Link>
         {/* Icon Buttons */}
         <div className="hidden md:flex items-center gap-1">
           <Button
@@ -190,7 +201,7 @@ export function TopNavbar({ isSidebarOpen, toggleSidebar }: TopNavbarProps) {
                     <span className="ml-2">Create Shop</span>
                   </Button>
                 </Link>
-                <Link href={`https://milko-home.vercel.app/`}>
+                <Link href={`https://ayravel.com`} target="_blank">
                   <Button
                     variant="outline"
                     size="sm"

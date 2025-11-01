@@ -12,6 +12,7 @@ import { Loader2, Upload, Save } from "lucide-react";
 import {
   useGetSettingsQuery,
   useUpdateSettingsMutation,
+  useCreateSettingsMutation,
 } from "@/redux/featured/settings/settingsApi";
 import { FaTrash } from "react-icons/fa";
 
@@ -90,9 +91,9 @@ const MultiInput = ({
 };
 
 export default function GeneralSettingsPage() {
-  const { data: settingsData, isLoading: isFetching } = useGetSettingsQuery();
-  const [updateSettings, { isLoading: isUpdating }] =
-    useUpdateSettingsMutation();
+  const { data: settingsData, isLoading: isFetching, refetch } = useGetSettingsQuery();
+  const [updateSettings, { isLoading: isUpdating }] = useUpdateSettingsMutation();
+  const [createSettings, { isLoading: isCreating }] = useCreateSettingsMutation();
 
   const [settings, setSettings] = useState<GeneralSettings>({
     enableHomepagePopup: false,
@@ -216,11 +217,14 @@ export default function GeneralSettingsPage() {
       formData.append("contactAndSocial[email]", settings.contactAndSocial.email);
       formData.append("contactAndSocial[phone]", settings.contactAndSocial.phone);
 
-      const result = await updateSettings(formData).unwrap();
+      const result = settingsData?._id 
+        ? await updateSettings(formData).unwrap()
+        : await createSettings(formData).unwrap();
 
       if (result.success) {
         toast.success("Settings saved successfully!");
         setPopupImageFile(null);
+        refetch();
       }
     } catch (error: any) {
       console.error(error);
@@ -440,8 +444,8 @@ export default function GeneralSettingsPage() {
         </TabsContent>
       </Tabs>
 
-      <Button onClick={handleSubmit} disabled={isUpdating} className="mt-6">
-        {isUpdating ? (
+      <Button onClick={handleSubmit} disabled={isUpdating || isCreating} className="mt-6">
+        {(isUpdating || isCreating) ? (
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
         ) : (
           <Save className="mr-2 h-4 w-4" />

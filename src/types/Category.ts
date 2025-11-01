@@ -1,5 +1,5 @@
 export interface ICategory {
-  subCategories: []; 
+  subCategories: string[]; // Array of ObjectIds
   _id: string;
   name: string;
   slug: string;
@@ -8,8 +8,9 @@ export interface ICategory {
     name: string;
     url: string;
   };
-  image: File | string;
+  image: File;
   bannerImg: File;
+  parentCategory?: string; // ObjectId of parent category
   createdAt: string;
   updatedAt: string; 
   __v: number;

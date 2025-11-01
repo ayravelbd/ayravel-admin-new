@@ -356,6 +356,12 @@ const MultipleSelector = ({
           const newOptions = [...selected, { value, label: value }]
           setSelected(newOptions)
           onChange?.(newOptions)
+          
+          // Close dropdown if maxSelected is 1 (single select behavior)
+          if (maxSelected === 1) {
+            setOpen(false)
+            inputRef.current?.blur()
+          }
         }}
       >
         {`Create "${inputValue}"`}
@@ -591,6 +597,12 @@ const MultipleSelector = ({
                                 const newOptions = [...selected, option]
                                 setSelected(newOptions)
                                 onChange?.(newOptions)
+                                
+                                // Close dropdown if maxSelected is 1 (single select behavior)
+                                if (maxSelected === 1) {
+                                  setOpen(false)
+                                  inputRef.current?.blur()
+                                }
                               }}
                               className={cn(
                                 "cursor-pointer",

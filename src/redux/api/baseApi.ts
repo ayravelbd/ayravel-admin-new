@@ -4,7 +4,7 @@ import { RootState } from "../store";
 const baseURL = process.env.NEXT_PUBLIC_BASE_API;
 // console.log(process.env.NEXT_PUBLIC_BASE_API);
 // const baseURL = 'http://localhost:5000/api/v1';
-// const baseURL = "https://milko-backend-eta.vercel.app/api/v1";
+// const baseURL = "https://ayravel-backend-eta.vercel.app/api/v1";
 const baseQuery = fetchBaseQuery({
   baseUrl: baseURL,
   credentials: "include",

@@ -9,11 +9,13 @@ import toast from "react-hot-toast";
 import {
   useGetSettingsQuery,
   useUpdateSettingsMutation,
+  useCreateSettingsMutation,
 } from "@/redux/featured/settings/settingsApi";
 
 export default function SettingsTab() {
-  const { data, isLoading } = useGetSettingsQuery();
+  const { data, isLoading, refetch } = useGetSettingsQuery();
   const [updateSettings, { isLoading: updating }] = useUpdateSettingsMutation();
+  const [createSettings, { isLoading: creating }] = useCreateSettingsMutation();
 
   const [activeTab, setActiveTab] = useState<"mobileMfs" | "deliveryCharge">("mobileMfs");
 
@@ -89,7 +91,9 @@ export default function SettingsTab() {
         console.log(pair[0], pair[1]);
       }
 
-      const res = await updateSettings(formData).unwrap();
+      const res = data?._id 
+        ? await updateSettings(formData).unwrap()
+        : await createSettings(formData).unwrap();
 
       if (res.success) {
         toast.success(
@@ -99,6 +103,8 @@ export default function SettingsTab() {
         );
         // Clear files state after successful upload
         setFiles({});
+        // Refetch to see updated data
+        refetch();
       }
     } catch (error) {
       console.error(error);
@@ -180,8 +186,8 @@ export default function SettingsTab() {
           ))}
 
           <div className="md:col-span-2 flex justify-end mt-2">
-            <Button type="submit" disabled={updating}>
-              {updating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+            <Button type="submit" disabled={updating || creating}>
+              {(updating || creating) ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
               Save Changes
             </Button>
           </div>
@@ -197,8 +203,8 @@ export default function SettingsTab() {
             onChange={(e) => setDeliveryCharge(Number(e.target.value))}
           />
 
-          <Button type="submit" disabled={updating}>
-            {updating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+          <Button type="submit" disabled={updating || creating}>
+            {(updating || creating) ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Save Delivery Charge
           </Button>
         </form>

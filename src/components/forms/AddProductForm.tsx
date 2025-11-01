@@ -31,7 +31,7 @@ import {
 import { Checkbox } from "../ui/checkbox";
 import MultipleSelector from "../ui/multiselect";
 
-import { useGetAllCategoriesQuery } from "@/redux/featured/categories/categoryApi";
+import { useGetAllCategoriesQuery, useGetMainCategoriesQuery, useGetSubCategoriesQuery } from "@/redux/featured/categories/categoryApi";
 
 import { useAppDispatch } from "@/redux/hooks";
 import { setTags } from "@/redux/featured/tags/tagsSlice";
@@ -66,6 +66,8 @@ export default function AddProductForm() {
   const [createProduct] = useCreateProductMutation();
   const { data: categoriesData, isLoading: isCategoriesLoading } =
     useGetAllCategoriesQuery(undefined);
+  // const { data: mainCategoriesData, isLoading: isMainCategoriesLoading } =
+  //   useGetMainCategoriesQuery(undefined);
   const { data: tagsData, isLoading: isTagsLoading } =
     useGetAllTagsQuery(undefined);
   const { data: brands, isLoading: isBrandsLoading } =
@@ -83,6 +85,7 @@ export default function AddProductForm() {
       video: "",
       brandAndCategories: {
         categories: [],
+        subcategory: "",
         tags: [],
       },
       description: {
@@ -189,6 +192,28 @@ export default function AddProductForm() {
       value: cat._id,
       label: cat.name,
     })) ?? [];
+
+  const simplifiedMainCategories: Option[] =
+    categoriesData?.map((cat: any) => ({
+      value: cat._id,
+      label: cat.name,
+    })) ?? [];
+
+
+
+  // Watch selected categories to get subcategories
+  const selectedCategories = form.watch("brandAndCategories.categories");
+  const firstSelectedCategory = selectedCategories?.[0];
+  
+  // Get subcategories from the selected main category
+  const selectedMainCategory = categoriesData?.find(cat => cat._id === firstSelectedCategory);
+  const simplifiedSubCategories: Option[] =
+    selectedMainCategory?.subCategories?.map((subCat: string) => ({
+      value: subCat,
+      label: subCat,
+    })) ?? [];
+
+
 
   const simplifiedTags: Option[] =
     tagsData?.data?.map((tag: any) => ({
@@ -784,6 +809,46 @@ export default function AddProductForm() {
               Organization
             </h2>
             {/* Brand */}
+            {/* <FormField
+              control={form.control}
+              name="brandAndCategories.brand"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Brand</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a brand" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {isBrandsLoading ? (
+                        <SelectItem disabled value="loading">
+                          <span className="animate-pulse text-gray-400">
+                            Loading Brands...
+                          </span>
+                        </SelectItem>
+                      ) : (brands ?? []).length > 0 ? (
+                        (brands ?? []).map((brand) => (
+                          <SelectItem key={brand._id} value={brand._id}>
+                            {brand.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem disabled value="no-brands">
+                          No brands available
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            /> */}
+
             {/* Categories */}
             <FormField
               control={form.control}
@@ -802,16 +867,22 @@ export default function AddProductForm() {
                         value={
                           field.value
                             .map((val) =>
-                              simplifiedCategories.find(
+                              simplifiedMainCategories.find(
                                 (opt) => opt.value === val
                               )
                             )
                             .filter(Boolean) as Option[]
                         }
-                        onChange={(options) =>
-                          field.onChange(options.map((opt) => opt.value))
-                        }
-                        defaultOptions={simplifiedCategories}
+                        onChange={(options) => {
+                          const values = options.map((opt) => opt.value);
+                          field.onChange(values);
+                          // Clear subcategory when main categories change
+                          form.setValue("brandAndCategories.subcategory", "");
+                        }}
+                        defaultOptions={simplifiedMainCategories}
+                        options={simplifiedMainCategories}
+                        creatable={false}
+                        maxSelected={1}
                         placeholder="Select categories..."
                         emptyIndicator={
                           <p className="text-center text-sm">
@@ -825,6 +896,34 @@ export default function AddProductForm() {
                 </FormItem>
               )}
             />
+
+            {/* SubCategory */}
+            {firstSelectedCategory && (
+              <FormField
+                control={form.control}
+                name="brandAndCategories.subcategory"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>SubCategory</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select subcategory" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {simplifiedSubCategories.map((subCat) => (
+                          <SelectItem key={subCat.value} value={subCat.value}>
+                            {subCat.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             {/* Tags */}
             <FormField

@@ -145,6 +145,7 @@ export default function EditProductForm({ id }: { id: string }) {
           categories: product.brandAndCategories.categories.map(
             (cat: any) => cat._id
           ),
+          subcategory: (product.brandAndCategories as any).subcategory || "",
           tags: product.brandAndCategories.tags.map((tag: any) => tag._id),
         },
         description: {
@@ -246,6 +247,18 @@ export default function EditProductForm({ id }: { id: string }) {
     categoriesData?.map((cat: any) => ({
       value: cat._id,
       label: cat.name,
+    })) ?? [];
+
+  // Watch selected categories to get subcategories
+  const selectedCategories = form.watch("brandAndCategories.categories");
+  const firstSelectedCategory = selectedCategories?.[0];
+  
+  // Get subcategories from the selected main category
+  const selectedMainCategory = categoriesData?.find(cat => cat._id === firstSelectedCategory);
+  const simplifiedSubCategories: Option[] =
+    selectedMainCategory?.subCategories?.map((subCat: string) => ({
+      value: subCat,
+      label: subCat,
     })) ?? [];
 
   const simplifiedTags: Option[] =
@@ -891,10 +904,13 @@ export default function EditProductForm({ id }: { id: string }) {
                             )
                             .filter(Boolean) as Option[]
                         }
-                        onChange={(options) =>
-                          field.onChange(options.map((opt) => opt.value))
-                        }
+                        onChange={(options) => {
+                          field.onChange(options.map((opt) => opt.value));
+                          // Clear subcategory when main categories change
+                          form.setValue("brandAndCategories.subcategory", "");
+                        }}
                         defaultOptions={simplifiedCategories}
+                        maxSelected={1}
                         placeholder="Select categories..."
                         emptyIndicator={
                           <p className="text-center text-sm">
@@ -908,6 +924,35 @@ export default function EditProductForm({ id }: { id: string }) {
                 </FormItem>
               )}
             />
+            
+            {/* SubCategory */}
+            {firstSelectedCategory && (
+              <FormField
+                control={form.control}
+                name="brandAndCategories.subcategory"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>SubCategory</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select subcategory" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {simplifiedSubCategories.map((subCat) => (
+                          <SelectItem key={subCat.value} value={subCat.value}>
+                            {subCat.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            
             <FormField
               control={form.control}
               name="brandAndCategories.tags"
