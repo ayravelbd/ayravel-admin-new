@@ -15,6 +15,7 @@ import {
   useCreateSettingsMutation,
 } from "@/redux/featured/settings/settingsApi";
 import { FaTrash } from "react-icons/fa";
+import { is } from "zod/v4/locales";
 
 interface GeneralSettings {
   enableHomepagePopup: boolean;
@@ -38,6 +39,10 @@ interface GeneralSettings {
     instagramUrl: string[];
     whatsappLink: string[];
     youtubeUrl: string[];
+  };
+  facebookPixel: {
+    isEnabled: boolean;
+    pixelId: string;
   };
 }
 
@@ -79,13 +84,18 @@ const MultiInput = ({
           </button>
         </div>
       ))}
-      <button
-        type="button"
-        onClick={handleAdd}
-        className="text-blue-500 font-semibold mt-1"
-      >
-        + Add another
-      </button>
+      {
+        values.length === 0 && (
+          <button
+            type="button"
+            onClick={handleAdd}
+            className="text-blue-500 font-semibold mt-1"
+          >
+            + Add 
+          </button>
+        )
+      }
+
     </div>
   );
 };
@@ -112,8 +122,10 @@ export default function GeneralSettingsPage() {
       whatsappLink: [],
       youtubeUrl: [],
     },
+    facebookPixel: { isEnabled: false, pixelId: "" },
   });
-
+  console.log(settingsData);
+  
   const [popupImageFile, setPopupImageFile] = useState<File | null>(null);
 
   useEffect(() => {
@@ -148,6 +160,10 @@ export default function GeneralSettingsPage() {
           whatsappLink: parseLinks(settingsData.contactAndSocial?.whatsappLink),
           youtubeUrl: parseLinks(settingsData.contactAndSocial?.youtubeUrl),
         },
+        facebookPixel: {
+          isEnabled: settingsData.facebookPixel?.isEnabled || false,
+          pixelId: settingsData.facebookPixel?.pixelId || "",
+        }
       });
     }
   }, [settingsData]);
@@ -216,10 +232,14 @@ export default function GeneralSettingsPage() {
       formData.append("contactAndSocial[address]", settings.contactAndSocial.address);
       formData.append("contactAndSocial[email]", settings.contactAndSocial.email);
       formData.append("contactAndSocial[phone]", settings.contactAndSocial.phone);
+      // Append Facebook Pixel settings
+      formData.append("facebookPixel[isEnabled]", String(settings.facebookPixel.isEnabled));
+      formData.append("facebookPixel[pixelId]", settings.facebookPixel.pixelId);
 
       const result = settingsData?._id 
         ? await updateSettings(formData).unwrap()
         : await createSettings(formData).unwrap();
+console.log(result);
 
       if (result.success) {
         toast.success("Settings saved successfully!");
@@ -245,10 +265,11 @@ export default function GeneralSettingsPage() {
       <h1 className="text-2xl font-bold mb-4">General Settings</h1>
 
       <Tabs defaultValue="popup" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 bg-muted p-1 rounded-xl">
+        <TabsList className="grid w-full grid-cols-4 bg-muted p-1 rounded-xl">
           <TabsTrigger value="popup">Popup</TabsTrigger>
           <TabsTrigger value="policy">Policies</TabsTrigger>
           <TabsTrigger value="contact">Contact & Social</TabsTrigger>
+          <TabsTrigger value="facebookPixel">FaceBook Pixel</TabsTrigger>
         </TabsList>
 
         {/* POPUP TAB */}
@@ -441,6 +462,54 @@ export default function GeneralSettingsPage() {
               />
             </div>
           </div>
+        </TabsContent>
+
+        {/* FACEBOOK PIXEL TAB */}
+        <TabsContent value="facebookPixel" className="space-y-4 mt-6">
+          <div className="flex items-center gap-4">
+            <Switch
+              checked={settings.facebookPixel.isEnabled}
+              onCheckedChange={(v) =>
+                setSettings((prev) => ({
+                  ...prev,
+                  facebookPixel: {
+                    ...prev.facebookPixel,
+                    isEnabled: Boolean(v),
+                  },
+                }))
+              }
+            />
+            <span className="font-medium">Enable Facebook Pixel</span>
+          </div>
+
+          <div>
+            <label className="block mb-1 text-sm font-medium">Pixel ID</label>
+            <Input
+              placeholder="Enter Facebook Pixel ID"
+              value={settings.facebookPixel.pixelId}
+              onChange={(e) =>
+                setSettings((prev) => ({
+                  ...prev,
+                  facebookPixel: { ...prev.facebookPixel, pixelId: e.target.value },
+                }))
+              }
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Add your Facebook Pixel ID to enable tracking. Example: 123456789012345
+            </p>
+          </div>
+
+          <div>
+            <label className="block mb-1 text-sm font-medium">Status</label>
+            <div
+              className={`inline-flex items-center px-2 py-1 rounded-full text-sm font-semibold ${
+                settings.facebookPixel.isEnabled ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+              }`}
+            >
+              {settings.facebookPixel.isEnabled ? "Enabled" : "Disabled"}
+            </div>
+          </div>
+
         </TabsContent>
       </Tabs>
 

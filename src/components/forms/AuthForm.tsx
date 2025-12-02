@@ -55,7 +55,7 @@ export default function AuthForm({ type }: AuthFormProps) {
      w-96 md:w-[450px] lg:w-[666px] sm:px-8"
     >
       <div className="flex justify-center">
-        <h1 className="font-bold bg-base lg:text-3xl text-xl">Ayravel</h1>
+        <Image src="/logo.jpeg" alt="AYraveL Logo" width={100} height={100} />
       </div>
 
       <h2 className="my-6 capitalize text-center">{type} to dashboard</h2>

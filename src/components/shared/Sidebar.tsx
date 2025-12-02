@@ -456,7 +456,7 @@ export function AppSidebar({
         />
         {!isCollapsed && (
           <h1 className="text-lg font-bold text-black truncate transition-opacity duration-200">
-            AYravel
+            AYraveL
           </h1>
         )}
       </div>
