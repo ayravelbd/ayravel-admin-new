@@ -124,7 +124,7 @@ export default function GeneralSettingsPage() {
     },
     facebookPixel: { isEnabled: false, pixelId: "" },
   });
-  console.log(settingsData);
+
   
   const [popupImageFile, setPopupImageFile] = useState<File | null>(null);
 
@@ -239,7 +239,7 @@ export default function GeneralSettingsPage() {
       const result = settingsData?._id 
         ? await updateSettings(formData).unwrap()
         : await createSettings(formData).unwrap();
-console.log(result);
+
 
       if (result.success) {
         toast.success("Settings saved successfully!");

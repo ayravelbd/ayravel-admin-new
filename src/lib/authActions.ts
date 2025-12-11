@@ -40,7 +40,7 @@ export function useAuthHandlers() {
   const handleLogin = async (data: { email: string; password: string }) => {
     try {
       const res = await loginUser(data).unwrap();
-      console.log(res);
+      
       
       if (res?.success) {
         dispatch(setUser(res.data));

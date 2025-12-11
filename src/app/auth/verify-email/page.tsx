@@ -38,9 +38,9 @@ const VerifyEmail = () => {
     ? decodeURIComponent(searchParams.get("email")!)
     : "";
 
-  console.log(" verify page email", email);
+
   useEffect(() => {
-    console.log("Verify email page loaded with email:", email);
+   
 
     // Start countdown timer for resend
     const timer = setInterval(() => {

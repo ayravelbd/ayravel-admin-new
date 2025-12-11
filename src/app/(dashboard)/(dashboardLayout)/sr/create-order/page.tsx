@@ -226,7 +226,7 @@ const CreateOrder = () => {
 
     try {
       const res = await createOrder(finalOrder as any).unwrap();
-      console.log(res);
+    
 
       setFormData({});
       setSelectedProducts([]);

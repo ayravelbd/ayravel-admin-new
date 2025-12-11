@@ -21,7 +21,7 @@ export default function PasswordChangeForm() {
   const currentUser = useAppSelector(selectCurrentUser)
 
 
-  console.log(currentUser);
+
 
 
   const fields = [

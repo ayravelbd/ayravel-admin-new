@@ -85,15 +85,15 @@ export default function Category({
 
   useEffect(() => {
     if (editCategory) {
-      console.log('Original subcategories:', editCategory.subCategories);
+     
       const mappedSubCategories = editCategory.subCategories?.map((sub: string) => {
-        console.log('Mapping subcategory:', sub);
+     
         return {
           value: sub || 'empty',
           label: sub || 'Unnamed Category',
         };
       }) || [];
-      console.log('Final mapped subcategories:', mappedSubCategories);
+      
       reset({
         name: editCategory.name || "",
         details: editCategory.details || "",
