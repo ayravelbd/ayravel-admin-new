@@ -43,6 +43,10 @@ export interface ISettings {
   contactAndSocial: IContactAndSocial;
   mobileMfs?: IMobileMfsItem; // ✅ Added here
   sliderImages?: string[];
+  facebookPixel?: {
+    isEnabled: boolean;
+    pixelId: string;
+  };
   createdAt?: string;
   updatedAt?: string;
   __v?: number;

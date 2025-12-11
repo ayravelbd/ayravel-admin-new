@@ -26,13 +26,22 @@ const categoriesApi = baseApi.injectEndpoints({
       }),
       transformResponse: (response: { data: ICategory }) => response.data,
     }),
-    editCategory: builder.mutation<ICategory, { id: string; updateDetails: any } >({
+    editCategory: builder.mutation<
+      ICategory,
+      { id: string; updateDetails: any }
+    >({
       query: ({ id, updateDetails }) => ({
         url: `/category/edit-category/${id}`,
         method: 'PATCH',
         body: updateDetails,
       }),
       transformResponse: (response: { data: ICategory }) => response.data,
+    }),
+    deleteCategory: builder.mutation<{ success: boolean; id: string }, string>({
+      query: id => ({
+        url: `/category/delete-category/${id}`,
+        method: 'DELETE',
+      }),
     }),
     getMainCategories: builder.query<ICategory[], void>({
       query: () => ({
@@ -42,7 +51,7 @@ const categoriesApi = baseApi.injectEndpoints({
       transformResponse: (response: { data: ICategory[] }) => response.data,
     }),
     getSubCategories: builder.query<ICategory[], string>({
-      query: (parentId) => ({
+      query: parentId => ({
         url: `/category/subcategories/${parentId}`,
         method: 'GET',
       }),
@@ -57,5 +66,6 @@ export const {
   useGetSingleCategoryQuery,
   useEditCategoryMutation,
   useGetMainCategoriesQuery,
-  useGetSubCategoriesQuery
+  useGetSubCategoriesQuery,
+  useDeleteCategoryMutation,
 } = categoriesApi;

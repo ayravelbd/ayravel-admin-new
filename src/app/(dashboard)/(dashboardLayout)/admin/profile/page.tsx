@@ -13,16 +13,16 @@ const ProfilePage = () => {
   // if (isLoading) return <LoadingSpinner/>;
   // if (error) return <ErrorMessage/>;
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 py-6">
+    <div className=" max-w-3xl mx-auto py-6">
       <div className="space-y-6">
         {/* <ProfileCard adminProfile={adminProfile} /> */}
-        <ProfileCard />
+        {/* <ProfileCard /> */}
         <PasswordChangeForm />
       </div>
       {/* Profile */}
       <div className="xl:col-span-2">
         {/* <UpdateProfileCard  adminProfile={adminProfile} /> */}
-        <UpdateProfileCard />
+        {/* <UpdateProfileCard /> */}
       </div>
     </div>
   );

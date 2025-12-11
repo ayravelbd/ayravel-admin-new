@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-
+import Swal from 'sweetalert2'
 import {
   Search,
   Filter,
@@ -21,7 +21,7 @@ import {
   selectCategories,
   setCategories,
 } from '@/redux/featured/categories/categorySlice';
-import { useGetAllCategoriesQuery } from '@/redux/featured/categories/categoryApi';
+import { useDeleteCategoryMutation, useGetAllCategoriesQuery } from '@/redux/featured/categories/categoryApi';
 import { IconBase } from 'react-icons/lib';
 import ViewCategoryDetails from '@/components/category/ViewCategory';
 import Category from '@/components/category/Category';
@@ -31,7 +31,7 @@ export default function CategoryManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
   const dispatch = useAppDispatch();
-
+  const [deleteCategory] = useDeleteCategoryMutation()
   const categories = useAppSelector(selectCategories);
 
   useEffect(() => {
@@ -84,6 +84,31 @@ export default function CategoryManagement() {
       setCurrentPage(prev => prev - 1);
     }
   };
+
+
+  const deleteHandle = (categoryId: string) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const res = await deleteCategory(categoryId).unwrap();
+        console.log(res);
+        
+        Swal.fire({
+          title: "Deleted!",
+          text: "Your Category has been deleted.",
+          icon: "success"
+        });
+        refetch();
+      }
+    });
+  }
 
   return (
     <div className="space-y-6 py-6">
@@ -238,6 +263,7 @@ export default function CategoryManagement() {
                           Edit
                         </Category>
                         <ViewCategoryDetails category={category} />
+                        <Button onClick={()=> deleteHandle(category._id)} className='bg-red-500'>Delete</Button>
                       </div>
                     </td>
                   </tr>
