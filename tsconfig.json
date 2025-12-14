@@ -29,7 +29,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/app/(dashboardLayout)/SEOPage"
-, "src/app/(dashboard)/(dashboardLayout)/admin/settings/coupons/page.tsx"  ],
+    "src/app/(dashboardLayout)/SEOPage",
+    "src/app/(dashboard)/(dashboardLayout)/admin/settings/coupons/page.tsx"
+  ],
   "exclude": ["node_modules"]
 }
